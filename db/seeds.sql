@@ -1,8 +1,17 @@
-INSERT INTO departments (name)
-VALUES  ("")
+USE team_db;
+INSERT INTO department (name)
+VALUES  ("Marketing"),
+("Finance"),
+("HR");
 
-INSERT INTO roles (title, salary, department_id)
-VALUES ("")
+INSERT INTO role (title, salary, department_id)
+VALUES 
+("Director of Marketing", 120000, 0003),
+("CFO", 250000, 0001),
+("VP HR", 150000, 0002);
 
-INSERT INTO employees (first_name, last_name, role_id, manager_id)
-VALUES ("")
+INSERT INTO employee (first_name, last_name, role_id, manager_id)
+VALUES 
+("Betty", "White", 1, NULL),
+("John", "Smith",2, NULL),
+("Karen", "Baker", 3,2);
