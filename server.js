@@ -44,7 +44,8 @@ inquirer
     ])
     .then((answers) => {
         // console.log(answers.options)
-        department();
+        // department();
+        employee();
     })
     .catch((error) => {
         if (error.isTtyError) {
@@ -61,6 +62,36 @@ inquirer
 
 const department = ()=> {
     db.query(`SELECT * FROM department`, (err, res) => {
+        if (err) {
+            console.log(err);
+        }
+        console.table(res);
+    });
+}
+
+const role = ()=> {
+    db.query(`SELECT * FROM role`, (err, res) => {
+        if (err) {
+            console.log(err);
+        }
+        console.table(res);
+    });
+}
+
+//Need to correct manager - right now it is pulling as the person itself
+const employee = ()=> {
+    db.query(`
+    SELECT e.id,
+    e.first_name,
+    e.last_name,
+    r.title,
+    d.name AS department,
+    r.salary, 
+    concat(e.first_name, ' ', e.last_name) AS manager
+    FROM employee e
+    LEFT JOIN role r ON e.role_id = r.id
+    LEFT JOIN department d ON d.id = r.department_id`,
+    (err, res) => {
         if (err) {
             console.log(err);
         }
