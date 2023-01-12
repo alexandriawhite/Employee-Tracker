@@ -15,18 +15,12 @@ const db = mysql.createConnection(
     },
 );
 
-// // Query database
-// db.query('SELECT * FROM department', function (err, results) {
-//     console.table(results);
-// });
 
-
-
-db.promise().query("SELECT * FROM department")
-  .then( ([rows,fields]) => {
-    console.table(rows);
-  })
-  .catch(console.log);
+// db.promise().query("SELECT * FROM department")
+//     .then(([department]) => {
+//         console.table(department);
+//     })
+//     .catch(console.log);
 
 
 inquirer
@@ -36,19 +30,21 @@ inquirer
             type: "list",
             name: "options",
             message: "Select one of the following",
-            choices:[ "View departments",
-            "View roles",
-            "View employees",
-            "Add department",
-            "Add role",
-            "Add employee",
-            "Update employee role",
-            "Cancel"
-        ]
+            choices: [
+                "View all departments",
+                "View all roles",
+                "View all employees",
+                "Add a department",
+                "Add a role",
+                "Add an employee",
+                "Update an employee role",
+                "Quit"
+            ]
         }
     ])
     .then((answers) => {
-        console.log(answers.options)
+        // console.log(answers.options)
+        department();
     })
     .catch((error) => {
         if (error.isTtyError) {
@@ -63,4 +59,11 @@ inquirer
     // promise the queries and make them their own functions 
 
 
-    
+const department = ()=> {
+    db.query(`SELECT * FROM department`, (err, res) => {
+        if (err) {
+            console.log(err);
+        }
+        console.table(res);
+    });
+}
