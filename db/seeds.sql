@@ -6,9 +6,9 @@ VALUES  ("Marketing"),
 
 INSERT INTO role (title, salary, department_id)
 VALUES 
-("Director of Marketing", 120000, 0003),
-("CFO", 250000, 0001),
-("VP HR", 150000, 0002);
+("Director of Marketing", 120000, 0001),
+("CFO", 250000, 0002),
+("VP HR", 150000, 0003);
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES 

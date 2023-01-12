@@ -76,7 +76,6 @@ id AS department_id
 const role = () => {
     db.query(`
     SELECT 
-    *,
     r.title AS job_title,
     r.id AS role_id,
     d.name AS department,
