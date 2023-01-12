@@ -44,9 +44,17 @@ inquirer
     ])
     .then((answers) => {
         // console.log(answers.options)
-        // department();
+        switch(answers.options) {
+        case "View all departments":
+        department();
+        break;
+        case "View all roles":
+        role();
+        break;
+        case "View all employees":
         employee();
-        // role();
+        break;
+        }
     })
     .catch((error) => {
         if (error.isTtyError) {
