@@ -45,7 +45,8 @@ inquirer
     .then((answers) => {
         // console.log(answers.options)
         // department();
-        employee();
+        // employee();
+        role();
     })
     .catch((error) => {
         if (error.isTtyError) {
@@ -56,12 +57,15 @@ inquirer
     });
 
 
-    // use async await instead of then
-    // promise the queries and make them their own functions 
+// use async await instead of then
+// promise the queries and make them their own functions 
 
 
-const department = ()=> {
-    db.query(`SELECT * FROM department`, (err, res) => {
+const department = () => {
+    db.query(`
+    SELECT name AS department_name,
+id AS department_id
+    FROM department`, (err, res) => {
         if (err) {
             console.log(err);
         }
@@ -69,8 +73,16 @@ const department = ()=> {
     });
 }
 
-const role = ()=> {
-    db.query(`SELECT * FROM role`, (err, res) => {
+const role = () => {
+    db.query(`
+    SELECT 
+    *,
+    r.title AS job_title,
+    r.id AS role_id,
+    d.name AS department,
+    r.salary
+    FROM role r
+    JOIN department d ON r.department_id = d.id`, (err, res) => {
         if (err) {
             console.log(err);
         }
@@ -79,7 +91,7 @@ const role = ()=> {
 }
 
 //Need to correct manager - right now it is pulling as the person itself
-const employee = ()=> {
+const employee = () => {
     db.query(`
     SELECT e.id,
     e.first_name,
@@ -91,10 +103,10 @@ const employee = ()=> {
     FROM employee e
     LEFT JOIN role r ON e.role_id = r.id
     LEFT JOIN department d ON d.id = r.department_id`,
-    (err, res) => {
-        if (err) {
-            console.log(err);
-        }
-        console.table(res);
-    });
+        (err, res) => {
+            if (err) {
+                console.log(err);
+            }
+            console.table(res);
+        });
 }
