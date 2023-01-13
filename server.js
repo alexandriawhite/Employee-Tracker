@@ -22,7 +22,7 @@ const db = mysql.createConnection(
 //     })
 //     .catch(console.log);
 
-
+function main() {
 inquirer
     .prompt([
         /* Pass your questions in here */
@@ -44,16 +44,31 @@ inquirer
     ])
     .then((answers) => {
         // console.log(answers.options)
-        switch(answers.options) {
-        case "View all departments":
-        department();
-        break;
-        case "View all roles":
-        role();
-        break;
-        case "View all employees":
-        employee();
-        break;
+        switch (answers.options) {
+            case "View all departments":
+                department();
+                break;
+            case "View all roles":
+                role();
+                break;
+            case "View all employees":
+                employee();
+                break;
+            case "Add a department":
+                addDepartment();
+                break;
+            case "Add a role":
+                addRole();
+                break;
+            case "Add an employee":
+                addEmployee();
+                break;
+            case "Update an employee role":
+                update();
+                break;
+            case "Quit":
+                console.log("Goodbye")
+                process.exit();
         }
     })
     .catch((error) => {
@@ -63,7 +78,9 @@ inquirer
             // Something else went wrong
         }
     });
+};
 
+main();
 
 // use async await instead of then
 // promise the queries and make them their own functions 
@@ -78,6 +95,7 @@ id AS department_id
             console.log(err);
         }
         console.table(res);
+        main();
     });
 }
 
@@ -94,6 +112,7 @@ const role = () => {
             console.log(err);
         }
         console.table(res);
+        main();
     });
 }
 
@@ -116,6 +135,7 @@ const employee = () => {
                 console.log(err);
             }
             console.table(res);
+            main();
         });
 }
 
