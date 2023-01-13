@@ -407,7 +407,7 @@ const depBudget = () => {
     db.query(`
     SELECT 
     d.name AS department,
-    sum(r.salary)
+    sum(r.salary) AS total_utilized_budget
     FROM employee e
     LEFT JOIN role r ON e.role_id = r.id
     LEFT JOIN department d ON d.id = r.department_id
