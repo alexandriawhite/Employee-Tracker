@@ -36,7 +36,7 @@ function main() {
                     "View all employees",
                     "View employees by manager",
                     "View employees by department",
-                    "View Department Budget",
+                    "View department budget",
                     "Add a department",
                     "Add a role",
                     "Add an employee",
@@ -63,7 +63,7 @@ function main() {
                 case "View employees by department":
                     employeeByDepartment();
                     break;
-                case "View Department Budget":
+                case "View department budget":
                     depBudget();
                     break;
                 case "Add a department":
@@ -96,7 +96,7 @@ function main() {
 // use async await instead of then
 // promise the queries and make them their own functions 
 
-
+//Display department table
 const department = () => {
     db.query(`
     SELECT name AS department_name,
@@ -109,7 +109,7 @@ id AS department_id
         main();
     });
 }
-
+//Display role table
 const role = () => {
     db.query(`
     SELECT 
@@ -127,7 +127,7 @@ const role = () => {
     });
 }
 
-//Need to correct manager - right now it is pulling as the person itself
+//Display employee table
 const employee = () => {
     db.query(`
     SELECT e.id AS employee_id,
@@ -150,8 +150,7 @@ const employee = () => {
         });
 }
 
-
-
+//Adds department to department table from user input
 const addDepartment = () => {
     inquirer
         .prompt([
@@ -182,8 +181,7 @@ const addDepartment = () => {
         })
 };
 
-
-
+//Adds role to the role table from user input
 const addRole = () => {
     inquirer
         .prompt([
@@ -229,6 +227,7 @@ const addRole = () => {
         })
 };
 
+//Adds employee to the employee table from user input
 const addEmployee = () => {
     inquirer
         .prompt([
@@ -283,6 +282,7 @@ const addEmployee = () => {
         })
 };
 
+//Updates selected employee
 const update = () => {
     const employee = () => db.promise().query(`
     SELECT e.id AS employee_id,
@@ -339,7 +339,7 @@ const update = () => {
                     return map[0]
                 })
                 .then((map) => {
-                    db.query(`UPDATE employee SET role_id=? WHERE id=?`, [map, answers.updateName], (err, res) => {
+                    db.query(`UPDATE employee SET role_id=? WHERE first_name=?`, [map, answers.updateName], (err, res) => {
                         if (err) {
                             console.log(err);
                         } db.query(`
@@ -365,7 +365,7 @@ const update = () => {
         });
 };
 
-
+//Displays list of employees and their managers
 const employeeByManager = () => {
     db.query(`
     SELECT 
@@ -384,7 +384,7 @@ const employeeByManager = () => {
         });
 }
 
-
+//Displays list of employees by department
 const employeeByDepartment = () => {
     db.query(`
     SELECT 
@@ -403,6 +403,7 @@ const employeeByDepartment = () => {
         });
 }
 
+//Displays department and the utilized budget
 const depBudget = () => {
     db.query(`
     SELECT 
