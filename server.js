@@ -34,6 +34,9 @@ function main() {
                     "View all departments",
                     "View all roles",
                     "View all employees",
+                    "View employees by manager",
+                    "View employees by department",
+                    "View Department Budget",
                     "Add a department",
                     "Add a role",
                     "Add an employee",
@@ -53,6 +56,15 @@ function main() {
                     break;
                 case "View all employees":
                     employee();
+                    break;
+                case "View employees by manager":
+                    employeeByManager();
+                    break;
+                case "View employees by department":
+                    employeeByDepartment();
+                    break;
+                case "View Department Budget":
+                    depBudget();
                     break;
                 case "Add a department":
                     addDepartment();
@@ -80,7 +92,6 @@ function main() {
         });
 };
 
-main();
 
 // use async await instead of then
 // promise the queries and make them their own functions 
@@ -164,6 +175,7 @@ const addDepartment = () => {
                             console.log(err);
                         }
                         console.table(res);
+                        main();
                     })
                 }
             })
@@ -210,6 +222,7 @@ const addRole = () => {
                             console.log(err);
                         }
                         console.table(res);
+                        main();
                     })
                 }
             })
@@ -263,6 +276,7 @@ const addEmployee = () => {
                             console.log(err);
                         }
                         console.table(res);
+                        main();
                     })
                 }
             })
@@ -296,7 +310,7 @@ const update = () => {
     JOIN department d ON r.department_id = d.id
     `)
         .then((rows) => {
-            let empRole = rows[0].map(obj => obj.title);
+            let empRole = rows[0].map(obj => obj.job_title);
             return empRole;
         })
     inquirer
@@ -315,4 +329,97 @@ const update = () => {
                 choices: role
             }
         ])
+        .then(answers => {
+            db.promise().query(`
+            SELECT id
+            FROM role
+            WHERE title = ?`, answers.updateRole)
+                .then(answer => {
+                    let map = answer[0].map(obj => obj.id);
+                    return map[0]
+                })
+                .then((map) => {
+                    db.query(`UPDATE employee SET role_id=? WHERE id=?`, [map, answers.updateName], (err, res) => {
+                        if (err) {
+                            console.log(err);
+                        } db.query(`
+            SELECT e.id AS employee_id,
+            e.first_name,
+            e.last_name,
+            r.title AS job_title,
+            d.name AS department,
+            r.salary, 
+            IFNULL(concat(e2.first_name,' ',e2.last_name), concat(e.first_name, ' ', e.last_name)) AS manager
+            FROM employee e
+            LEFT JOIN role r ON e.role_id = r.id
+            LEFT JOIN department d ON d.id = r.department_id
+            LEFT JOIN employee e2 ON e.manager_id = e2.id`, (err, res) => {
+                            if (err) {
+                                console.log(err);
+                            }
+                            console.table(res);
+                            main();
+                        })
+                    })
+                });
+        });
 };
+
+
+const employeeByManager = () => {
+    db.query(`
+    SELECT 
+    IFNULL(concat(e2.first_name,' ',e2.last_name), concat(e.first_name, ' ', e.last_name)) AS manager,
+    concat(e2.first_name,' ',e2.last_name) AS employee
+    FROM employee e
+    LEFT JOIN role r ON e.role_id = r.id
+    LEFT JOIN department d ON d.id = r.department_id
+    LEFT JOIN employee e2 ON e.manager_id = e2.id`,
+        (err, res) => {
+            if (err) {
+                console.log(err);
+            }
+            console.table(res);
+            main();
+        });
+}
+
+
+const employeeByDepartment = () => {
+    db.query(`
+    SELECT 
+    d.name AS department,
+    concat(e.first_name,' ',e.last_name) AS employee
+    FROM employee e
+    LEFT JOIN role r ON e.role_id = r.id
+    LEFT JOIN department d ON d.id = r.department_id
+    LEFT JOIN employee e2 ON e.manager_id = e2.id`,
+        (err, res) => {
+            if (err) {
+                console.log(err);
+            }
+            console.table(res);
+            main();
+        });
+}
+
+const depBudget = () => {
+    db.query(`
+    SELECT 
+    d.name AS department,
+    sum(r.salary)
+    FROM employee e
+    LEFT JOIN role r ON e.role_id = r.id
+    LEFT JOIN department d ON d.id = r.department_id
+    GROUP BY d.name,
+    r.salary`,
+        (err, res) => {
+            if (err) {
+                console.log(err);
+            }
+            console.table(res);
+            main();
+        });
+}
+
+main();
