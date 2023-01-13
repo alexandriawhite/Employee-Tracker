@@ -282,8 +282,37 @@ const update = () => {
     LEFT JOIN role r ON e.role_id = r.id
     LEFT JOIN department d ON d.id = r.department_id
     LEFT JOIN employee e2 ON e.manager_id = e2.id`)
-    .then((rows) => {
-        let title = row[0].map(obj => obj.title);
-        return title
-    })
+        .then((rows) => {
+            let empName = rows[0].map(obj => obj.first_name);
+            return empName;
+        })
+    const role = () => db.promise().query(`
+    SELECT 
+    r.title AS job_title,
+    r.id AS role_id,
+    d.name AS department,
+    r.salary
+    FROM role r
+    JOIN department d ON r.department_id = d.id
+    `)
+        .then((rows) => {
+            let empRole = rows[0].map(obj => obj.title);
+            return empRole;
+        })
+    inquirer
+        .prompt([
+            {
+                type: 'list',
+                name: 'updateName',
+                message: 'Select one of the following',
+                choices: employee
+
+            },
+            {
+                type: 'list',
+                name: 'updateRole',
+                message: 'Update role to:',
+                choices: role
+            }
+        ])
 };
