@@ -369,8 +369,8 @@ const update = () => {
 const employeeByManager = () => {
     db.query(`
     SELECT 
-    IFNULL(concat(e2.first_name,' ',e2.last_name), concat(e.first_name, ' ', e.last_name)) AS manager,
-    concat(e2.first_name,' ',e2.last_name) AS employee
+    concat(e.first_name,' ',e.last_name) AS employee,
+    IFNULL(concat(e2.first_name,' ',e2.last_name), concat(e.first_name, ' ', e.last_name)) AS manager
     FROM employee e
     LEFT JOIN role r ON e.role_id = r.id
     LEFT JOIN department d ON d.id = r.department_id
