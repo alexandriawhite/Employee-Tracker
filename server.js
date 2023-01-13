@@ -193,7 +193,7 @@ const addRole = () => {
             }
         ])
         .then((answers) => {
-            db.query(`INSERT INTO roles(title, salary, department_id) 
+            db.query(`INSERT INTO role(title, salary, department_id) 
             VALUES(?,?,?)`, [answers.title, answers.salary, answers.department_id], (err, res) => {
                 if (err) {
                     console.log(err);
@@ -270,5 +270,20 @@ const addEmployee = () => {
 };
 
 const update = () => {
-
+    const employee = () => db.promise().query(`
+    SELECT e.id AS employee_id,
+    e.first_name,
+    e.last_name,
+    r.title AS job_title,
+    d.name AS department,
+    r.salary, 
+    IFNULL(concat(e2.first_name,' ',e2.last_name), concat(e.first_name, ' ', e.last_name)) AS manager
+    FROM employee e
+    LEFT JOIN role r ON e.role_id = r.id
+    LEFT JOIN department d ON d.id = r.department_id
+    LEFT JOIN employee e2 ON e.manager_id = e2.id`)
+    .then((rows) => {
+        let title = row[0].map(obj => obj.title);
+        return title
+    })
 };
