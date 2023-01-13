@@ -153,20 +153,20 @@ const addDepartment = () => {
         ])
         .then((answers) => {
             db.query(`INSERT INTO department(name) VALUES(?)`, answers.addDepartment, (err, res) => {
-                    if (err) {
-                        console.log(err);
-                    } else {
-                        db.query(`
+                if (err) {
+                    console.log(err);
+                } else {
+                    db.query(`
                 SELECT name AS department_name,
                 id AS department_id
                     FROM department`, (err, res) => {
-                            if (err) {
-                                console.log(err);
-                            }
-                            console.table(res);
-                        })
-                    }
-                })
+                        if (err) {
+                            console.log(err);
+                        }
+                        console.table(res);
+                    })
+                }
+            })
         })
 };
 
@@ -177,7 +177,56 @@ const addRole = () => {
 };
 
 const addEmployee = () => {
-
+    inquirer
+        .prompt([
+            /* Pass your questions in here */
+            {
+                type: "input",
+                name: "first_name",
+                message: "Enter employee first name"
+            },
+            {
+                type: "input",
+                name: "last_name",
+                message: "Enter employee last name"
+            },
+            {
+                type: "input",
+                name: "role_id",
+                message: "Enter employee role ID"
+            },
+            {
+                type: "input",
+                name: "manager_id",
+                message: "Enter employee manager",
+            },
+        ])
+        .then((answers) => {
+            db.query(`INSERT INTO employee(first_name, last_name, role_id, manager_id) 
+        VALUES(?,?,?,?)`, [answers.first_name, answers.last_name, answers.role_id, answers.manager_id], (err, res) => {
+                if (err) {
+                    console.log(err);
+                } else {
+                    db.query(`
+                    SELECT e.id AS employee_id,
+                    e.first_name,
+                    e.last_name,
+                    r.title AS job_title,
+                    d.name AS department,
+                    r.salary, 
+                    IFNULL(concat(e2.first_name,' ',e2.last_name), concat(e.first_name, ' ', e.last_name)) AS manager
+                    FROM employee e
+                    LEFT JOIN role r ON e.role_id = r.id
+                    LEFT JOIN department d ON d.id = r.department_id
+                    LEFT JOIN employee e2 ON e.manager_id = e2.id`, (err, res) => {
+                        if (err) {
+                            console.log(err);
+                        }
+                        console.table(res);
+                    })
+                }
+            })
+        })
 };
 
 const update = () => {
