@@ -41,6 +41,7 @@ function main() {
                     "Add a role",
                     "Add an employee",
                     "Update an employee role",
+                    "Update employee's manager",
                     "Quit"
                 ]
             }
@@ -77,6 +78,9 @@ function main() {
                     break;
                 case "Update an employee role":
                     update();
+                    break;
+                case "Update employee's manager":
+                    updateManager();
                     break;
                 case "Quit":
                     console.log("Goodbye")
@@ -422,5 +426,88 @@ const depBudget = () => {
             main();
         });
 }
+
+
+const updateManager = () => {
+    const employee = () => db.promise().query(`
+    SELECT e.id AS employee_id,
+    e.first_name,
+    e.last_name,
+    r.title AS job_title,
+    d.name AS department,
+    r.salary, 
+    IFNULL(concat(e2.first_name,' ',e2.last_name), concat(e.first_name, ' ', e.last_name)) AS manager
+    FROM employee e
+    LEFT JOIN role r ON e.role_id = r.id
+    LEFT JOIN department d ON d.id = r.department_id
+    LEFT JOIN employee e2 ON e.manager_id = e2.id`)
+        .then((rows) => {
+            let empName = rows[0].map(obj => obj.first_name);
+            return empName;
+        })
+    const manager = () => db.promise().query(`
+    SELECT 
+    concat(e.first_name,' ',e.last_name) AS employee,
+    IFNULL(concat(e2.first_name,' ',e2.last_name), concat(e.first_name, ' ', e.last_name)) AS manager
+    FROM employee e
+    LEFT JOIN role r ON e.role_id = r.id
+    LEFT JOIN department d ON d.id = r.department_id
+    LEFT JOIN employee e2 ON e.manager_id = e2.id`)
+        .then((rows) => {
+            let empRole = rows[0].map(obj => obj.employee);
+            return empRole;
+        })
+    inquirer
+        .prompt([
+            {
+                type: 'list',
+                name: 'updateName',
+                message: 'Select one of the following:',
+                choices: employee
+
+            },
+            {
+                type: 'list',
+                name: 'updateManager',
+                message: 'Update manager to:',
+                choices: manager
+            }
+        ])
+        .then(answers => {
+            db.promise().query(`
+        SELECT manager_id
+        FROM employee
+        WHERE manager_id = ?`, answers.updateManager)
+                .then(answer => {
+                    let map = answer[0].map(obj => obj.manager_id);
+                    return map[0]
+                })
+                .then((map) => {
+                    db.query(`UPDATE employee SET manager_id=? WHERE first_name=?`, [map, answers.updateName], (err, res) => {
+                        if (err) {
+                            console.log(err);
+                        } db.query(`
+        SELECT e.id AS employee_id,
+        e.first_name,
+        e.last_name,
+        r.title AS job_title,
+        d.name AS department,
+        r.salary, 
+        IFNULL(concat(e2.first_name,' ',e2.last_name), concat(e.first_name, ' ', e.last_name)) AS manager
+        FROM employee e
+        LEFT JOIN role r ON e.role_id = r.id
+        LEFT JOIN department d ON d.id = r.department_id
+        LEFT JOIN employee e2 ON e.manager_id = e2.id`, (err, res) => {
+                            if (err) {
+                                console.log(err);
+                            }
+                            console.table(res);
+                            main();
+                        })
+                    })
+                });
+        });
+};
+
 
 main();
