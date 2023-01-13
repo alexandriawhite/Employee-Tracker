@@ -164,7 +164,6 @@ const addDepartment = () => {
                                 console.log(err);
                             }
                             console.table(res);
-                            main();
                         })
                     }
                 })
