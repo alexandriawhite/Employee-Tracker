@@ -173,7 +173,47 @@ const addDepartment = () => {
 
 
 const addRole = () => {
-
+    inquirer
+        .prompt([
+            /* Pass your questions in here */
+            {
+                type: "input",
+                name: "title",
+                message: "Enter role title"
+            },
+            {
+                type: "input",
+                name: "salary",
+                message: "Enter salary"
+            },
+            {
+                type: "input",
+                name: "department_id",
+                message: "Enter department ID"
+            }
+        ])
+        .then((answers) => {
+            db.query(`INSERT INTO roles(title, salary, department_id) 
+            VALUES(?,?,?)`, [answers.title, answers.salary, answers.department_id], (err, res) => {
+                if (err) {
+                    console.log(err);
+                } else {
+                    db.query(`SELECT 
+                    r.title AS job_title,
+                    r.id AS role_id,
+                     d.name AS department,
+                     r.salary
+                     FROM role r
+                     JOIN department d ON r.department_id = d.id
+                     `, (err, res) => {
+                        if (err) {
+                            console.log(err);
+                        }
+                        console.table(res);
+                    })
+                }
+            })
+        })
 };
 
 const addEmployee = () => {
