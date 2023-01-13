@@ -23,61 +23,61 @@ const db = mysql.createConnection(
 //     .catch(console.log);
 
 function main() {
-inquirer
-    .prompt([
-        /* Pass your questions in here */
-        {
-            type: "list",
-            name: "options",
-            message: "Select one of the following",
-            choices: [
-                "View all departments",
-                "View all roles",
-                "View all employees",
-                "Add a department",
-                "Add a role",
-                "Add an employee",
-                "Update an employee role",
-                "Quit"
-            ]
-        }
-    ])
-    .then((answers) => {
-        // console.log(answers.options)
-        switch (answers.options) {
-            case "View all departments":
-                department();
-                break;
-            case "View all roles":
-                role();
-                break;
-            case "View all employees":
-                employee();
-                break;
-            case "Add a department":
-                addDepartment();
-                break;
-            case "Add a role":
-                addRole();
-                break;
-            case "Add an employee":
-                addEmployee();
-                break;
-            case "Update an employee role":
-                update();
-                break;
-            case "Quit":
-                console.log("Goodbye")
-                process.exit();
-        }
-    })
-    .catch((error) => {
-        if (error.isTtyError) {
-            // Prompt couldn't be rendered in the current environment
-        } else {
-            // Something else went wrong
-        }
-    });
+    inquirer
+        .prompt([
+            /* Pass your questions in here */
+            {
+                type: "list",
+                name: "options",
+                message: "Select one of the following",
+                choices: [
+                    "View all departments",
+                    "View all roles",
+                    "View all employees",
+                    "Add a department",
+                    "Add a role",
+                    "Add an employee",
+                    "Update an employee role",
+                    "Quit"
+                ]
+            }
+        ])
+        .then((answers) => {
+            // console.log(answers.options)
+            switch (answers.options) {
+                case "View all departments":
+                    department();
+                    break;
+                case "View all roles":
+                    role();
+                    break;
+                case "View all employees":
+                    employee();
+                    break;
+                case "Add a department":
+                    addDepartment();
+                    break;
+                case "Add a role":
+                    addRole();
+                    break;
+                case "Add an employee":
+                    addEmployee();
+                    break;
+                case "Update an employee role":
+                    update();
+                    break;
+                case "Quit":
+                    console.log("Goodbye")
+                    process.exit();
+            }
+        })
+        .catch((error) => {
+            if (error.isTtyError) {
+                // Prompt couldn't be rendered in the current environment
+            } else {
+                // Something else went wrong
+            }
+        });
 };
 
 main();
@@ -141,3 +141,46 @@ const employee = () => {
 
 
 
+const addDepartment = () => {
+    inquirer
+        .prompt([
+            /* Pass your questions in here */
+            {
+                type: "input",
+                name: "addDepartment",
+                message: "Enter department name",
+            }
+        ])
+        .then((answers) => {
+            db.query(`INSERT INTO department(name) VALUES(?)`, answers.addDepartment, (err, res) => {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        db.query(`
+                SELECT name AS department_name,
+                id AS department_id
+                    FROM department`, (err, res) => {
+                            if (err) {
+                                console.log(err);
+                            }
+                            console.table(res);
+                            main();
+                        })
+                    }
+                })
+        })
+};
+
+
+
+const addRole = () => {
+
+};
+
+const addEmployee = () => {
+
+};
+
+const update = () => {
+
+};
