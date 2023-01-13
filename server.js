@@ -106,10 +106,11 @@ const employee = () => {
     r.title AS job_title,
     d.name AS department,
     r.salary, 
-    IFNULL(e.manager_id, 'e.first_name, ' ', e.last_name') AS manager
+    IFNULL(concat(e2.first_name,' ',e2.last_name), concat(e.first_name, ' ', e.last_name)) AS manager
     FROM employee e
     LEFT JOIN role r ON e.role_id = r.id
-    LEFT JOIN department d ON d.id = r.department_id`,
+    LEFT JOIN department d ON d.id = r.department_id
+    LEFT JOIN employee e2 ON e.manager_id = e2.id`,
         (err, res) => {
             if (err) {
                 console.log(err);
