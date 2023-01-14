@@ -446,7 +446,7 @@ const updateManager = () => {
             return empName;
         })
     const manager = () => db.promise().query(`
-    SELECT 
+    SELECT e.id,
     concat(e.first_name,' ',e.last_name) AS employee,
     IFNULL(concat(e2.first_name,' ',e2.last_name), concat(e.first_name, ' ', e.last_name)) AS manager
     FROM employee e
@@ -454,7 +454,11 @@ const updateManager = () => {
     LEFT JOIN department d ON d.id = r.department_id
     LEFT JOIN employee e2 ON e.manager_id = e2.id`)
         .then((rows) => {
-            let empRole = rows[0].map(obj => obj.employee);
+            let empRole = rows[0].map((obj) => {
+                return {
+                    name: obj.employee, value: obj.id
+                }
+            });
             return empRole;
         })
     inquirer
@@ -474,19 +478,10 @@ const updateManager = () => {
             }
         ])
         .then(answers => {
-            db.promise().query(`
-        SELECT manager_id
-        FROM employee
-        WHERE manager_id = ?`, answers.updateManager)
-                .then(answer => {
-                    let map = answer[0].map(obj => obj.manager_id);
-                    return map[0]
-                })
-                .then((map) => {
-                    db.query(`UPDATE employee SET manager_id=? WHERE first_name=?`, [map, answers.updateName], (err, res) => {
-                        if (err) {
-                            console.log(err);
-                        } db.query(`
+            db.query(`UPDATE employee SET manager_id=? WHERE first_name=?`, [answers.updateManager, answers.updateName], (err, res) => {
+                if (err) {
+                    console.log(err);
+                } db.query(`
         SELECT e.id AS employee_id,
         e.first_name,
         e.last_name,
@@ -498,14 +493,13 @@ const updateManager = () => {
         LEFT JOIN role r ON e.role_id = r.id
         LEFT JOIN department d ON d.id = r.department_id
         LEFT JOIN employee e2 ON e.manager_id = e2.id`, (err, res) => {
-                            if (err) {
-                                console.log(err);
-                            }
-                            console.table(res);
-                            main();
-                        })
-                    })
-                });
+                    if (err) {
+                        console.log(err);
+                    }
+                    console.table(res);
+                    main();
+                })
+            })
         });
 };
 
